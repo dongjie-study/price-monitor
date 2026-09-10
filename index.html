@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小米全品类价格监控报告（手机适配版）- 2026年9月10日</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #333; padding: 20px; }
+  .container { max-width: 1300px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #ff6700 0%, #ff8c42 100%); color: #fff; padding: 28px 32px; border-radius: 12px; margin-bottom: 20px; }
+  .header h1 { font-size: 22px; margin-bottom: 6px; }
+  .header p { font-size: 13px; opacity: 0.92; }
+  .update-tag { display: inline-block; background: rgba(255,255,255,0.25); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
+
+  .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .ov-card { background: #fff; border-radius: 10px; padding: 18px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  .ov-card .ov-label { font-size: 12px; color: #999; margin-bottom: 6px; }
+  .ov-card .ov-value { font-size: 24px; font-weight: 700; color: #ff6700; }
+  .ov-card .ov-sub { font-size: 11px; color: #bbb; margin-top: 4px; }
+
+  /* 抖音店铺速查表 */
+  .dy-shop-ref { background: #fff; border-radius: 12px; padding: 22px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .dy-shop-ref h2 { font-size: 16px; margin-bottom: 14px; color: #c2185b; border-left: 4px solid #c2185b; padding-left: 10px; }
+  .shop-ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .shop-ref-item { background: #fafafa; border-radius: 8px; padding: 12px 14px; border-left: 3px solid #c2185b; }
+  .shop-ref-item .sname { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; }
+  .shop-ref-item .sid { font-size: 11px; color: #999; margin-bottom: 4px; }
+  .shop-ref-item .sdesc { font-size: 11px; color: #666; line-height: 1.5; }
+  .shop-ref-item a { color: #c2185b; text-decoration: none; font-size: 11px; }
+  .shop-ref-item a:hover { text-decoration: underline; }
+
+  /* 产品卡片 */
+  .product-card { background: #fff; border-radius: 12px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+  .product-header { padding: 16px 22px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .product-title { font-size: 16px; font-weight: 600; color: #333; }
+  .product-title .cat-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 3px; margin-right: 8px; font-weight: 500; }
+  .cat-wear { background: #e3f2fd; color: #1565c0; }
+  .cat-audio { background: #f3e5f5; color: #7b1fa2; }
+  .product-lowest { font-size: 13px; color: #666; }
+  .product-lowest strong { color: #2e7d32; font-size: 16px; }
+
+  .platform-row { display: grid; grid-template-columns: 110px 1fr; border-bottom: 1px solid #f7f7f7; }
+  .platform-row:last-child { border-bottom: none; }
+  .platform-label { padding: 14px 18px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; border-right: 1px solid #f0f0f0; }
+  .platform-label.jd { color: #1565c0; background: #f5f9ff; }
+  .platform-label.tm { color: #e65100; background: #fff8f0; }
+  .platform-label.dy { color: #c2185b; background: #fdf2f8; }
+  .shop-list { padding: 12px 18px; }
+  .shop-item { padding: 10px 0; border-bottom: 1px dashed #f0f0f0; }
+  .shop-item:last-child { border-bottom: none; }
+  .shop-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+  .shop-info { flex: 1; min-width: 220px; }
+  .shop-name { font-size: 13px; font-weight: 600; color: #333; }
+  .shop-name .self-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-left: 6px; font-weight: 500; }
+  .tag-self { background: #e8f5e9; color: #2e7d32; }
+  .tag-official { background: #fff3e0; color: #e65100; }
+  .tag-auth { background: #f3e5f5; color: #7b1fa2; }
+  .tag-live { background: #fce4ec; color: #c2185b; }
+  .shop-id { font-size: 11px; color: #999; margin-top: 2px; }
+  .shop-desc { font-size: 11px; color: #888; margin-top: 3px; line-height: 1.5; }
+  .price-block { text-align: right; min-width: 150px; }
+  .price-original { font-size: 11px; color: #bbb; text-decoration: line-through; }
+  .price-final { font-size: 16px; font-weight: 700; color: #ff6700; }
+  .price-final.low { color: #2e7d32; }
+  .price-note { font-size: 10px; color: #999; margin-top: 1px; }
+  .shop-links { margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .buy-link { display: inline-block; font-size: 11px; color: #1565c0; text-decoration: none; padding: 3px 10px; border: 1px solid #bbdefb; border-radius: 4px; transition: all 0.2s; }
+  .buy-link:hover { background: #e3f2fd; }
+  .buy-link.dy-link { color: #c2185b; border-color: #f8bbd0; }
+  .buy-link.dy-link:hover { background: #fce4ec; }
+  .buy-link.tm-link { color: #e65100; border-color: #ffe0b2; }
+  .buy-link.tm-link:hover { background: #fff3e0; }
+
+  .chart-card { background: #fff; border-radius: 12px; padding: 22px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .chart-card h2 { font-size: 16px; margin-bottom: 14px; color: #ff6700; border-left: 4px solid #ff6700; padding-left: 10px; }
+  .chart-box { width: 100%; height: 400px; }
+
+  .note-card { background: #fffde7; border-left: 4px solid #fbc02d; border-radius: 8px; padding: 16px 20px; margin-bottom: 18px; font-size: 13px; color: #5d4037; line-height: 1.9; }
+  .note-card strong { color: #e65100; }
+
+  .nav-tabs { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .nav-tab { padding: 8px 18px; background: #fff; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid #e0e0e0; transition: all 0.2s; }
+  .nav-tab.active { background: #ff6700; color: #fff; border-color: #ff6700; }
+  .nav-tab:hover { border-color: #ff6700; color: #ff6700; }
+  .nav-tab.active:hover { color: #fff; }
+
+  /* 表格横向滚动容器 */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    .container { max-width: 100%; }
+    .header { padding: 18px 16px; border-radius: 10px; margin-bottom: 14px; }
+    .header h1 { font-size: 17px; line-height: 1.4; }
+    .header p { font-size: 12px; line-height: 1.6; }
+    .update-tag { display: block; margin: 8px 0 0 0; font-size: 10px; width: fit-content; }
+
+    .overview { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+    .ov-card { padding: 14px 10px; border-radius: 8px; }
+    .ov-card .ov-label { font-size: 11px; }
+    .ov-card .ov-value { font-size: 20px; }
+    .ov-card .ov-sub { font-size: 10px; }
+
+    .section { padding: 16px 14px; border-radius: 10px; margin-bottom: 14px; }
+    .section h2 { font-size: 15px; margin-bottom: 12px; }
+
+    .dy-shop-ref { padding: 16px 14px; border-radius: 10px; margin-bottom: 14px; }
+    .dy-shop-ref h2 { font-size: 15px; margin-bottom: 12px; }
+    .shop-ref-grid { grid-template-columns: 1fr; gap: 10px; }
+    .shop-ref-item { padding: 10px 12px; }
+
+    .product-card { border-radius: 10px; margin-bottom: 14px; }
+    .product-header { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
+    .product-title { font-size: 15px; }
+    .product-lowest { font-size: 12px; }
+    .product-lowest strong { font-size: 15px; }
+
+    .platform-row { grid-template-columns: 1fr; }
+    .platform-label { border-right: none; border-bottom: 1px solid #f0f0f0; padding: 10px 16px; font-size: 13px; justify-content: flex-start; }
+    .shop-list { padding: 12px 14px; }
+
+    .shop-item { padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+    .shop-top { flex-direction: column; gap: 8px; }
+    .shop-info .shop-name { font-size: 13px; }
+    .shop-info .shop-id { font-size: 10px; }
+    .shop-info .shop-desc { font-size: 11px; line-height: 1.5; }
+    .price-block { text-align: left; }
+    .price-block .price-final { font-size: 18px; }
+    .price-block .price-original { font-size: 12px; }
+    .price-block .price-note { font-size: 10px; }
+
+    .shop-links { margin-top: 8px; }
+    .buy-link { display: inline-block; font-size: 12px; padding: 6px 12px; margin: 3px 4px 3px 0; border-radius: 6px; min-height: 32px; line-height: 20px; }
+    .buy-link.direct { font-size: 12px; padding: 6px 12px; }
+
+    .chart-box { height: 320px; }
+
+    .note-card { padding: 14px 16px; border-radius: 8px; font-size: 12px; line-height: 1.8; margin-bottom: 14px; }
+
+    table { font-size: 12px; min-width: 560px; }
+    th, td { padding: 10px 8px; }
+    .price { font-size: 14px; }
+  }
+
+  @media (max-width: 480px) {
+    .header h1 { font-size: 16px; }
+    .overview { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .ov-card { padding: 12px 8px; }
+    .ov-card .ov-value { font-size: 18px; }
+    .section { padding: 14px 12px; }
+    .section h2 { font-size: 14px; }
+    .product-header { padding: 12px 14px; }
+    .product-title { font-size: 14px; }
+    .shop-list { padding: 10px 12px; }
+    .shop-item { padding: 10px; }
+    .buy-link { font-size: 11px; padding: 5px 10px; min-height: 30px; }
+    .chart-box { height: 280px; }
+    table { min-width: 520px; font-size: 11px; }
+    th, td { padding: 8px 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>小米全品类价格监控报告 <span class="update-tag">2026-09-10 11:35 更新 · 直接链接版</span></h1>
+  <p>监控范围：穿戴5款 + 耳机3款 ｜ 平台：京东自营 · 天猫自营 · 抖音全站（含具体店铺/直播间名+抖音号+链接）</p>
+</div>
+
+<!-- 概览 -->
+<div class="overview">
+  <div class="ov-card">
+    <div class="ov-label">监控产品总数</div>
+    <div class="ov-value">8</div>
+    <div class="ov-sub">穿戴5款 + 耳机3款</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-label">抖音监控店铺数</div>
+    <div class="ov-value">12+</div>
+    <div class="ov-sub">官方旗舰店+直播间+平台自营+授权店</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-label">今日全网最低</div>
+    <div class="ov-value">¥148</div>
+    <div class="ov-sub">Redmi Buds 8 Pro（抖音叠特殊优惠）</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-label">国补普遍力度</div>
+    <div class="ov-value">15%</div>
+    <div class="ov-sub">部分地区可叠加平台券</div>
+  </div>
+</div>
+
+<!-- 抖音店铺速查表 -->
+<div class="dy-shop-ref">
+  <h2>抖音平台主要店铺/直播间速查表（点击直达）</h2>
+  <div class="shop-ref-grid">
+    <div class="shop-ref-item">
+      <div class="sname">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+      <div class="sid">抖音号：xiaomizhibojian</div>
+      <div class="sdesc">原小米直播间更名，综合类全品类，手环/手表/耳机均有售</div>
+      <a href="https://www.douyin.com/search/小米官方旗舰店" target="_blank">→ 进入店铺搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">小米官旗手表直播间 <span class="self-tag tag-live">直播间</span></div>
+      <div class="sid">手表专类直播间</div>
+      <div class="sdesc">Watch S5 / Watch 5 等手表专售，国补+优惠+表带表膜赠品</div>
+      <a href="https://www.douyin.com/search/小米官旗手表直播间" target="_blank">→ 进入直播间搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">小米耳机官方直播间 <span class="self-tag tag-live">直播间</span></div>
+      <div class="sid">抖音号：mifenkejizhijia</div>
+      <div class="sdesc">耳机专类，每天早7点直播，Buds 6 / Buds 8 Pro / 耳夹式耳机</div>
+      <a href="https://www.douyin.com/search/小米耳机官方直播间" target="_blank">→ 进入直播间搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">小米数码旗舰店 <span class="self-tag tag-auth">授权</span></div>
+      <div class="sid">抖音号：63679435353</div>
+      <div class="sdesc">手环/手表/耳机数码好物，官方正品米仓发货，全国联保</div>
+      <a href="https://www.douyin.com/search/小米数码旗舰店" target="_blank">→ 进入店铺搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">小米官方旗舰店手机直播间 <span class="self-tag tag-live">直播间</span></div>
+      <div class="sid">抖音号：mifentiyan</div>
+      <div class="sdesc">小米官方旗舰店授权账号，手机为主，可咨询全品类</div>
+      <a href="https://www.douyin.com/search/小米官方旗舰店手机直播间" target="_blank">→ 进入直播间搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">抖音电商广州自营旗舰店 <span class="self-tag tag-self">平台自营</span></div>
+      <div class="sid">抖音平台自营</div>
+      <div class="sdesc">手环11等新品，广州发货，含运费险，7天无理由</div>
+      <a href="https://www.douyin.com/search/抖音电商广州自营旗舰店" target="_blank">→ 进入店铺搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">抖音电商成都高新自营旗舰店 <span class="self-tag tag-self">平台自营</span></div>
+      <div class="sid">抖音平台自营</div>
+      <div class="sdesc">手环11 NFC版等，成都发货，国补后288.15</div>
+      <a href="https://www.douyin.com/search/抖音电商成都高新自营旗舰店" target="_blank">→ 进入店铺搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">抖音电商上海自营旗舰店 <span class="self-tag tag-self">平台自营</span></div>
+      <div class="sid">抖音平台自营</div>
+      <div class="sdesc">手环11 NFC版等，上海发货，含运费险</div>
+      <a href="https://www.douyin.com/search/抖音电商上海自营旗舰店" target="_blank">→ 进入店铺搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">抖音电商武汉自营旗舰店 <span class="self-tag tag-self">平台自营</span></div>
+      <div class="sid">抖音平台自营</div>
+      <div class="sdesc">手环11 NFC版349，满299减10+国补后288.15，武汉发货</div>
+      <a href="https://www.douyin.com/search/抖音电商武汉自营旗舰店" target="_blank">→ 进入店铺搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">抖音电商杭州余杭自营旗舰店 <span class="self-tag tag-self">平台自营</span></div>
+      <div class="sid">抖音平台自营</div>
+      <div class="sdesc">手环11等新品，杭州发货</div>
+      <a href="https://www.douyin.com/search/抖音电商杭州余杭自营旗舰店" target="_blank">→ 进入店铺搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">小米智能设备旗舰店 <span class="self-tag tag-auth">授权</span></div>
+      <div class="sid">授权专卖店</div>
+      <div class="sdesc">手环11等，定金预售模式，付定金10元+尾款</div>
+      <a href="https://www.douyin.com/search/小米智能设备旗舰店" target="_blank">→ 进入店铺搜索</a>
+    </div>
+    <div class="shop-ref-item">
+      <div class="sname">小米之家线下授权店 <span class="self-tag tag-auth">授权</span></div>
+      <div class="sid">各城市小米之家</div>
+      <div class="sdesc">佛山南海九江店、河南商丘夏邑力达广场店、河北保定定州万达店等</div>
+      <a href="https://www.douyin.com/search/小米之家 专卖店" target="_blank">→ 搜索附近小米之家</a>
+    </div>
+  </div>
+</div>
+
+<!-- 分类导航 -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="filterCategory('all')">全部产品</div>
+  <div class="nav-tab" onclick="filterCategory('wear')">穿戴设备</div>
+  <div class="nav-tab" onclick="filterCategory('audio')">音频耳机</div>
+</div>
+
+<!-- ==================== 穿戴设备 ==================== -->
+
+<!-- 小米手环11 -->
+<div class="product-card" data-cat="wear">
+  <div class="product-header">
+    <div class="product-title"><span class="cat-tag cat-wear">穿戴</span>小米手环11 <span style="font-size:12px;color:#999;font-weight:400;">（9月7日新品首销）</span></div>
+    <div class="product-lowest">全网最低：<strong>¥198起</strong>（抖音叠多重优惠）</div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label jd">京东自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米京东自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">标准版首销价289 / NFC版339 / 陶瓷版399，国补15%，晒单赢10元京豆</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥289</span> <span class="price-final low">¥245.65</span>
+            <div class="price-note">标准版国补后 / NFC版288.15 / 陶瓷版339.15</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://u.jd.com/x62s7Rx" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 标准版银色·直接打开</a>
+          <a href="https://u.jd.com/xagIvju" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 NFC版银色·直接打开</a>
+          <a href="https://u.jd.com/x1gsCDb" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 陶瓷版白色·直接打开</a>
+          <a href="https://search.jd.com/Search?keyword=小米手环11" target="_blank" class="buy-link">京东搜索更多版本</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label tm">天猫自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店（天猫） <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-desc">标准版299 / NFC版349，晒单返10元，国补15%，福州小米景明科技发货</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥299</span> <span class="price-final low">¥235.65</span>
+            <div class="price-note">标准版晒单返后 / NFC版339.15</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://e.tb.cn/h.8KOwgy0LhZTmJcn?tk=jfI6TShojIP" target="_blank" class="buy-link tm-link" style="background:#e65100;color:#fff;border-color:#e65100;">👉 直接打开商品详情</a>
+          <a href="https://list.tmall.com/search_product.htm?q=小米手环11" target="_blank" class="buy-link tm-link">天猫搜索手环11</a>
+          <a href="https://xiaomi.tmall.com" target="_blank" class="buy-link tm-link">小米官方旗舰店主页</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label dy">抖音全站</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-id">抖音号：xiaomizhibojian（原小米直播间更名）</div>
+            <div class="shop-desc">首销价同官方：标准版289 / NFC版339 / 陶瓷版399，国补后245.65/288.15</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥289</span> <span class="price-final">¥245.65</span>
+            <div class="price-note">标准版国补后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米手环11 小米官方旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→官方旗舰店手环11</a>
+          <a href="https://www.douyin.com/user/xiaomizhibojian" target="_blank" class="buy-link dy-link">店铺主页（抖音号xiaomizhibojian）</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">抖音电商广州自营旗舰店 <span class="self-tag tag-self">平台自营</span></div>
+            <div class="shop-id">抖音平台自营 · 广州发货</div>
+            <div class="shop-desc">标准版289，含运费险，7天无理由，小米智能穿戴授权号精选直播中</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥289</span>
+            <div class="price-note">标准版 / 国补后约245.65</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://v.douyin.com/KdS4LP-WC_c/" target="_blank" class="buy-link dy-link" style="background:#c2185b;color:#fff;border-color:#c2185b;">👉 直接打开商品详情</a>
+          <a href="https://www.douyin.com/search/小米手环11 抖音电商广州自营旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→广州自营手环11</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">抖音电商武汉自营旗舰店 <span class="self-tag tag-self">平台自营</span></div>
+            <div class="shop-id">抖音平台自营 · 武汉发货</div>
+            <div class="shop-desc">NFC版银色349，店铺满299减10+国补50.85，实付288.15</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥349</span> <span class="price-final low">¥288.15</span>
+            <div class="price-note">NFC版满减+国补后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米手环11 抖音电商武汉自营旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→武汉自营手环11</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">抖音电商成都高新/上海/杭州余杭自营旗舰店 <span class="self-tag tag-self">平台自营</span></div>
+            <div class="shop-id">抖音平台自营 · 成都/上海/杭州发货</div>
+            <div class="shop-desc">NFC版银色339，含运费险，7天无理由，国补后288.15</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥339</span> <span class="price-final">¥288.15</span>
+            <div class="price-note">NFC版国补后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米手环11 抖音电商自营旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→各城市自营手环11</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米智能设备旗舰店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">授权专卖店</div>
+            <div class="shop-desc">标准版289，定金预售：付定金10元+尾款</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥289</span>
+            <div class="price-note">标准版预售</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米手环11 小米智能设备旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→智能设备旗舰店手环11</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米之家线下授权店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">山东济宁济州上城店 / 湖北十堰人民北路店等</div>
+            <div class="shop-desc">标准版289同官方价，部分店加运费10元，实付296</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥289~296</span>
+            <div class="price-note">线下同价 / 部分加运费</div>
+          </div>
+        </div>
+      </div>
+      <div class="shop-item" style="background:#fff8e1; border-radius:6px; padding:10px;">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">全站最低价（需叠多重优惠）<span class="self-tag" style="background:#ffe0b2;color:#e65100;">限时</span></div>
+            <div class="shop-desc">9.9-9.10叠加教育优惠+开学季+超级88等多重优惠，需学生认证</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final low">¥198起</span>
+            <div class="price-note">标准版 / 非所有用户可享</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米手环11 教育优惠 开学季" target="_blank" class="buy-link dy-link">抖音搜索→手环11叠优惠</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 小米手环10 Pro -->
+<div class="product-card" data-cat="wear">
+  <div class="product-header">
+    <div class="product-title"><span class="cat-tag cat-wear">穿戴</span>小米手环10 Pro</div>
+    <div class="product-lowest">全网最低：<strong>¥246起</strong>（抖音叠多重优惠）</div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label jd">京东自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米京东自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">标准版399，国补15%减59.85，直播间送腕带，陶瓷版449/真皮版479</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥399</span> <span class="price-final low">¥339.15</span>
+            <div class="price-note">标准版国补后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://u.jd.com/xDyrRtH" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 标准版银色·直接打开</a>
+          <a href="https://u.jd.com/x6yYPyS" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 标准版黑色·直接打开</a>
+          <a href="https://u.jd.com/xDy2d8P" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 银色送膜·直接打开</a>
+          <a href="https://search.jd.com/Search?keyword=小米手环10Pro" target="_blank" class="buy-link">京东搜索更多版本</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label tm">天猫自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店（天猫） <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-desc">标准版399同官方价，国补至高85折，7天价保假一赔四</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥399</span> <span class="price-final">¥339.15</span>
+            <div class="price-note">国补后参考价</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://list.tmall.com/search_product.htm?q=小米手环10Pro" target="_blank" class="buy-link tm-link">天猫搜索手环10Pro</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label dy">抖音全站</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-id">抖音号：xiaomizhibojian</div>
+            <div class="shop-desc">标准版399，国补后339.15，7天无理由7天价保，国补至高85折</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥399</span> <span class="price-final">¥339.15</span>
+            <div class="price-note">标准版国补后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米手环10Pro 小米官方旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→官方旗舰店手环10Pro</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米数码旗舰店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">抖音号：63679435353</div>
+            <div class="shop-desc">标准版399，地方补贴10%，银色/樱花粉359.10，官方正品米仓发货</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥399</span> <span class="price-final">¥359.10</span>
+            <div class="price-note">地方补贴10%后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米手环10Pro 小米数码旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→数码旗舰店手环10Pro</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米之家河北保定定州万达广场专卖店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">线下小米之家</div>
+            <div class="shop-desc">银色399原价，线下自提，无国补</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥399</span>
+            <div class="price-note">线下原价</div>
+          </div>
+        </div>
+      </div>
+      <div class="shop-item" style="background:#fff8e1; border-radius:6px; padding:10px;">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">全站最低价（需叠多重优惠）<span class="self-tag" style="background:#ffe0b2;color:#e65100;">限时</span></div>
+            <div class="shop-desc">开学季+国补+教育优惠叠加，需学生认证</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final low">¥246起</span>
+            <div class="price-note">需多重优惠叠加</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米手环10Pro 开学季 教育优惠" target="_blank" class="buy-link dy-link">抖音搜索→手环10Pro叠优惠</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Redmi Watch 6 -->
+<div class="product-card" data-cat="wear">
+  <div class="product-header">
+    <div class="product-title"><span class="cat-tag cat-wear">穿戴</span>Redmi Watch 6</div>
+    <div class="product-lowest">全网最低：<strong>¥222起</strong>（抖音叠多重优惠）</div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label jd">京东自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米京东自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">今日直降569，国补15%减85.35，典雅黑/皎月银同价，好评率98%</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥569</span> <span class="price-final low">¥483.65</span>
+            <div class="price-note">国补后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://3.cn/3-2ysIB5?jkl=@VCAy80iAvA14@" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 直接打开商品详情（迷雾蓝）</a>
+          <a href="https://u.jd.com/xGuVxMM" target="_blank" class="buy-link">京东商品推广链接</a>
+          <a href="https://search.jd.com/Search?keyword=Redmi Watch 6" target="_blank" class="buy-link">京东搜索Watch6</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label tm">天猫自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店（天猫） <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-desc">标价699，百亿补贴+淘金币55.92+消费券40+国补62.9，实付356.49，深圳小米景明科技发货</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥699</span> <span class="price-final low">¥356.49起</span>
+            <div class="price-note">叠多重优惠后 / 部分订单368.17</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://list.tmall.com/search_product.htm?q=Redmi Watch 6" target="_blank" class="buy-link tm-link">天猫搜索Watch6</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label dy">抖音全站</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-id">抖音号：xiaomizhibojian</div>
+            <div class="shop-desc">标价699，百亿补贴+平台优惠+国补，实付356.49起，88VIP好评率97%</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥699</span> <span class="price-final low">¥356.49起</span>
+            <div class="price-note">叠多重优惠后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Watch 6 小米官方旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→官方旗舰店Watch6</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米品牌百亿补贴店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">品牌百亿补贴</div>
+            <div class="shop-desc">补贴后优惠75元，实付434免运费</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥434</span>
+            <div class="price-note">百亿补贴后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Watch 6 小米品牌 百亿补贴" target="_blank" class="buy-link dy-link">抖音搜索→百亿补贴Watch6</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">抖音平台自营店 <span class="self-tag tag-self">平台自营</span></div>
+            <div class="shop-id">抖音平台自营 · 隔日达</div>
+            <div class="shop-desc">国补15%+平台券立减50元，实付424.15~441.15，已售5万+件</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥424.15~441.15</span>
+            <div class="price-note">国补+平台券后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Watch 6 平台自营" target="_blank" class="buy-link dy-link">抖音搜索→平台自营Watch6</a>
+        </div>
+      </div>
+      <div class="shop-item" style="background:#fff8e1; border-radius:6px; padding:10px;">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">全站最低价（需叠多重优惠）<span class="self-tag" style="background:#ffe0b2;color:#e65100;">限时</span></div>
+            <div class="shop-desc">返校季+国补+平台券+教育优惠叠加，需学生认证，已售2万+件</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final low">¥222起</span>
+            <div class="price-note">需多重优惠叠加</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Watch 6 返校季 教育优惠" target="_blank" class="buy-link dy-link">抖音搜索→Watch6叠优惠</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Xiaomi Watch S5 -->
+<div class="product-card" data-cat="wear">
+  <div class="product-header">
+    <div class="product-title"><span class="cat-tag cat-wear">穿戴</span>Xiaomi Watch S5 <span style="font-size:12px;color:#999;font-weight:400;">蓝牙版 46mm</span></div>
+    <div class="product-lowest">全网最低：<strong>¥809起</strong>（抖音直播间限时）</div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label jd">京东自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米京东自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">银色46mm直降80元后1099，国补15%减164.85；午夜蓝1299</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥1099</span> <span class="price-final">¥934.15</span>
+            <div class="price-note">银色国补后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://item.jd.com/10225742261024.html" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 银色46mm·直接打开</a>
+          <a href="https://search.jd.com/Search?keyword=Xiaomi Watch S5" target="_blank" class="buy-link">京东搜索更多版本</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label tm">天猫自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店（天猫） <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-desc">标价1199，国补8.5折直减149.85元</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥1199</span> <span class="price-final low">¥849.15</span>
+            <div class="price-note">国补后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="http://www.taobao.com/list/item/czRnVjNFVG5jYmJzSzBnSlFabWZwZz09.htm" target="_blank" class="buy-link tm-link" style="background:#e65100;color:#fff;border-color:#e65100;">👉 46mm黑色·直接打开</a>
+          <a href="https://list.tmall.com/search_product.htm?q=Xiaomi Watch S5" target="_blank" class="buy-link tm-link">天猫搜索更多版本</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label dy">抖音全站</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官旗手表直播间 <span class="self-tag tag-live">直播间</span></div>
+            <div class="shop-id">手表专类官方直播间</div>
+            <div class="shop-desc">金秋优惠季+国补，送表带表膜四选三，有机会得88锦鲤；9月2日地补+锦鲤限时809起</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥1199</span> <span class="price-final low">¥849起</span>
+            <div class="price-note">直播间国补+优惠后 / 限时809起</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米官旗手表直播间 Watch S5" target="_blank" class="buy-link dy-link">抖音搜索→官旗手表直播间S5</a>
+          <a href="https://www.douyin.com/search/小米官旗手表直播间" target="_blank" class="buy-link dy-link">进入直播间主页</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-id">抖音号：xiaomizhibojian</div>
+            <div class="shop-desc">标价1199，直播间国补叠加优惠849.15起，购机礼赠三选二/四选三</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥1199</span> <span class="price-final">¥849.15起</span>
+            <div class="price-note">国补+优惠后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Xiaomi Watch S5 小米官方旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→官方旗舰店S5</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米之家线下授权店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">各城市小米之家</div>
+            <div class="shop-desc">线下同官方价1099~1199，国补后约934</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥934起</span>
+            <div class="price-note">国补后参考</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Xiaomi Watch 5 -->
+<div class="product-card" data-cat="wear">
+  <div class="product-header">
+    <div class="product-title"><span class="cat-tag cat-wear">穿戴</span>Xiaomi Watch 5 <span style="font-size:12px;color:#999;font-weight:400;">蓝牙版 / eSIM版</span></div>
+    <div class="product-lowest">全网最低：<strong>¥1441.15</strong>（抖音直播间蓝牙版）</div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label jd">京东自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米京东自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">蓝牙版1999，领券+国补15%；eSIM版2199，满1500减150+国补减307.35</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥1999</span> <span class="price-final">¥1486.65起</span>
+            <div class="price-note">蓝牙版 / eSIM版1741.65</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://item.jd.com/product/sp-zGZ_KyvE-ztUH3rvB-A.html" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 蓝牙版银色·直接打开</a>
+          <a href="https://search.jd.com/Search?keyword=Xiaomi Watch 5" target="_blank" class="buy-link">京东搜索eSIM版</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label tm">天猫自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">天猫数码家电自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">蓝牙/eSIM版标价2399；eSIM版国补直降269.85元</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥1799</span> <span class="price-final low">¥1529.15</span>
+            <div class="price-note">eSIM版国补后 / 蓝牙版暂无明确低价</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.taobao.com/list/item/QktJODZYQTUzR2MvcTlZSS9yc014QT09.htm" target="_blank" class="buy-link tm-link" style="background:#e65100;color:#fff;border-color:#e65100;">👉 蓝牙版·直接打开</a>
+          <a href="https://list.tmall.com/search_product.htm?q=Xiaomi Watch 5" target="_blank" class="buy-link tm-link">天猫搜索eSIM版</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label dy">抖音全站</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官旗手表直播间 <span class="self-tag tag-live">直播间</span></div>
+            <div class="shop-id">手表专类官方直播间</div>
+            <div class="shop-desc">蓝牙版国补15%+100平台券+88锦鲤，送表带表膜，拍S5/Watch5揪88锦鲤</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥1999</span> <span class="price-final low">¥1441.15起</span>
+            <div class="price-note">蓝牙版直播间活动价</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米官旗手表直播间 Watch 5" target="_blank" class="buy-link dy-link">抖音搜索→官旗手表直播间Watch5</a>
+          <a href="https://www.douyin.com/search/小米官旗手表直播间" target="_blank" class="buy-link dy-link">进入直播间主页</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-id">抖音号：xiaomizhibojian</div>
+            <div class="shop-desc">蓝牙版1999，直播间国补+优惠+88锦鲤，精美好礼四选三</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥1999</span> <span class="price-final">¥1441.15起</span>
+            <div class="price-note">蓝牙版直播间活动价</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Xiaomi Watch 5 小米官方旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→官方旗舰店Watch5</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米之家线下授权店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">各城市小米之家</div>
+            <div class="shop-desc">线下同官方价，蓝牙版1999 / eSIM版2199，国补后约1699~1869</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥1699起</span>
+            <div class="price-note">国补后参考</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 音频耳机 ==================== -->
+
+<!-- Xiaomi Buds 6 -->
+<div class="product-card" data-cat="audio">
+  <div class="product-header">
+    <div class="product-title"><span class="cat-tag cat-audio">耳机</span>Xiaomi Buds 6 <span style="font-size:12px;color:#999;font-weight:400;">半入耳式旗舰</span></div>
+    <div class="product-lowest">全网最低：<strong>¥466.5</strong>（天猫大促历史低价）</div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label jd">京东自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米京东自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">珍珠白/月影黑/星云紫，满减活动，国补15%，11mm三磁镀金动圈</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥699</span> <span class="price-final">¥569</span>
+            <div class="price-note">满减后 / 国补后约483.65</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://search.jd.com/Search?keyword=Xiaomi Buds 6" target="_blank" class="buy-link">京东搜索Buds 6</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label tm">天猫自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店（天猫） <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-desc">标价699，天猫促销到手528，国补可叠加，历史大促低价466.5</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥699</span> <span class="price-final low">¥528</span>
+            <div class="price-note">促销价 / 历史大促466.5</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://list.tmall.com/search_product.htm?q=Xiaomi Buds 6" target="_blank" class="buy-link tm-link">天猫搜索Buds 6</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label dy">抖音全站</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米耳机官方直播间 <span class="self-tag tag-live">直播间</span></div>
+            <div class="shop-id">抖音号：mifenkejizhijia（每天早7点直播）</div>
+            <div class="shop-desc">耳机专类直播间，Buds 6活动价，国补可叠加，7天无理由有运费险</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥699</span> <span class="price-final">¥589</span>
+            <div class="price-note">60元券后 / 国补后约500</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Xiaomi Buds 6 小米耳机官方直播间" target="_blank" class="buy-link dy-link">抖音搜索→耳机直播间Buds6</a>
+          <a href="https://www.douyin.com/search/小米耳机官方直播间" target="_blank" class="buy-link dy-link">进入直播间主页</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-id">抖音号：xiaomizhibojian</div>
+            <div class="shop-desc">标价699，直播间活动，国补可叠加</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥699</span> <span class="price-final">¥589</span>
+            <div class="price-note">60元券后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Xiaomi Buds 6 小米官方旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→官方旗舰店Buds6</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">砂之船小米之家 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">线下小米之家授权店</div>
+            <div class="shop-desc">原价649，店内60元券，到手589，哈曼金耳朵调音</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥649</span> <span class="price-final">¥589</span>
+            <div class="price-note">店内券后</div>
+          </div>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">广东家电团购店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">授权团购店</div>
+            <div class="shop-desc">月底特惠，buds6特价530，广东省内可下单</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final low">¥530</span>
+            <div class="price-note">团购特价 / 仅限广东省内</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Xiaomi Buds 6 团购 特价" target="_blank" class="buy-link dy-link">抖音搜索→Buds6团购特价</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Redmi Buds 8 Pro -->
+<div class="product-card" data-cat="audio">
+  <div class="product-header">
+    <div class="product-title"><span class="cat-tag cat-audio">耳机</span>Redmi Buds 8 Pro <span style="font-size:12px;color:#999;font-weight:400;">入耳式降噪</span></div>
+    <div class="product-lowest">全网最低：<strong>¥148</strong>（抖音叠特殊优惠史低）</div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label jd">京东自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米京东自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">冰釉白/玄悟黑/薄雾蓝，活动价369，领满200减25+国补15%，55dB深度降噪</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥369</span> <span class="price-final low">¥289</span>
+            <div class="price-note">领券+国补后 / 日常344</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://u.jd.com/9GmGM8X" target="_blank" class="buy-link" style="background:#1565c0;color:#fff;border-color:#1565c0;">👉 冰釉白·直接打开</a>
+          <a href="https://search.jd.com/Search?keyword=Redmi Buds 8 Pro" target="_blank" class="buy-link">京东搜索更多颜色</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label tm">天猫自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店（天猫） <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-desc">标价399，活动价369~375，国补可叠加，圈瓷同轴三单元</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥399</span> <span class="price-final">¥369</span>
+            <div class="price-note">活动价 / 国补后约313.65</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://pcdetail.taobao.com/dFg2MCsxMlNBSEdEdXVNYm03VEJsdz09.html" target="_blank" class="buy-link tm-link" style="background:#e65100;color:#fff;border-color:#e65100;">👉 薄雾蓝·直接打开</a>
+          <a href="https://list.tmall.com/search_product.htm?q=Redmi Buds 8 Pro" target="_blank" class="buy-link tm-link">天猫搜索更多颜色</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label dy">抖音全站</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米耳机官方直播间 <span class="self-tag tag-live">直播间</span></div>
+            <div class="shop-id">抖音号：mifenkejizhijia（每天早7点直播）</div>
+            <div class="shop-desc">耳机专类直播间，Buds 8 Pro活动价，国补可叠加，7天无理由有运费险</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥399</span> <span class="price-final">¥329</span>
+            <div class="price-note">活动价 / 国补后约279.65</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Buds 8 Pro 小米耳机官方直播间" target="_blank" class="buy-link dy-link">抖音搜索→耳机直播间Buds8Pro</a>
+          <a href="https://www.douyin.com/search/小米耳机官方直播间" target="_blank" class="buy-link dy-link">进入直播间主页</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-id">抖音号：xiaomizhibojian</div>
+            <div class="shop-desc">标价399，直播间活动，国补可叠加，小米商城发货</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥399</span> <span class="price-final">¥329</span>
+            <div class="price-note">活动价</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Buds 8 Pro 小米官方旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→官方旗舰店Buds8Pro</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">百纳贴品牌店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">品牌授权店</div>
+            <div class="shop-desc">冰釉白329，限时秒杀送5元券，正品险，7天无理由，实付299</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥329</span> <span class="price-final">¥299</span>
+            <div class="price-note">秒杀券后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Buds 8 Pro 百纳贴" target="_blank" class="buy-link dy-link">抖音搜索→百纳贴Buds8Pro</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米品牌多人团 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">品牌多人团购</div>
+            <div class="shop-desc">多人团享7折，冰釉白，实付279免运费</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final low">¥279</span>
+            <div class="price-note">多人团价</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Buds 8 Pro 多人团" target="_blank" class="buy-link dy-link">抖音搜索→Buds8Pro多人团</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米之家广东佛山南海区九江通讯街专卖店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">线下小米之家</div>
+            <div class="shop-desc">薄雾蓝399原价，线下自提，正品保障售后无忧</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥399</span>
+            <div class="price-note">线下原价</div>
+          </div>
+        </div>
+      </div>
+      <div class="shop-item" style="background:#fff8e1; border-radius:6px; padding:10px;">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">全站最低价（需叠特殊优惠）<span class="self-tag" style="background:#ffe0b2;color:#e65100;">史低</span></div>
+            <div class="shop-desc">需叠加平台特殊优惠券，非所有用户可享，历史最低价</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final low">¥148</span>
+            <div class="price-note">历史最低价 / 需特殊优惠</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/Redmi Buds 8 Pro 优惠券 史低" target="_blank" class="buy-link dy-link">抖音搜索→Buds8Pro优惠攻略</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 小米耳夹式耳机 -->
+<div class="product-card" data-cat="audio">
+  <div class="product-header">
+    <div class="product-title"><span class="cat-tag cat-audio">耳机</span>Xiaomi 耳夹式耳机 <span style="font-size:12px;color:#999;font-weight:400;">Clip 开放式</span></div>
+    <div class="product-lowest">全网最低：<strong>¥628.15</strong>（叠国补后三平台同价）</div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label jd">京东自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米京东自营旗舰店 <span class="self-tag tag-self">自营</span></div>
+            <div class="shop-desc">珍珠白/玄武岩黑/鸢尾紫，雷总推荐，领60元券，单耳5.5g，逆向声波防漏音</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥799</span> <span class="price-final low">¥739</span>
+            <div class="price-note">领券后 / 国补后约628.15</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://u.jd.com/9rmrlS0" target="_blank" class="buy-link">京东商品推广链接</a>
+          <a href="https://search.jd.com/Search?keyword=小米耳夹式耳机" target="_blank" class="buy-link">京东搜索耳夹式耳机</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label tm">天猫自营</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店（天猫） <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-desc">鸢尾紫天猫补贴价789，满减后739，国补可叠加，11mm微晶金属涂层振膜</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥799</span> <span class="price-final">¥739</span>
+            <div class="price-note">满减后 / 国补后约628.15</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://list.tmall.com/search_product.htm?q=小米耳夹式耳机" target="_blank" class="buy-link tm-link">天猫搜索耳夹式耳机</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="platform-label dy">抖音全站</div>
+    <div class="shop-list">
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米耳机官方直播间 <span class="self-tag tag-live">直播间</span></div>
+            <div class="shop-id">抖音号：mifenkejizhijia（每天早7点直播）</div>
+            <div class="shop-desc">耳机专类直播间，耳夹式耳机活动价，F会员领60元券，至高3期免息，7天无理由有运费险</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥799</span> <span class="price-final low">¥739</span>
+            <div class="price-note">F会员券后 / 国补后约628.15</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米耳夹式耳机 小米耳机官方直播间" target="_blank" class="buy-link dy-link">抖音搜索→耳机直播间耳夹式</a>
+          <a href="https://www.douyin.com/search/小米耳机官方直播间" target="_blank" class="buy-link dy-link">进入直播间主页</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米官方旗舰店 <span class="self-tag tag-official">官方</span></div>
+            <div class="shop-id">抖音号：xiaomizhibojian</div>
+            <div class="shop-desc">到手价799，F会员领60元券，至高3期免息，轻盈无感舒适佩戴</div>
+          </div>
+          <div class="price-block">
+            <span class="price-original">¥799</span> <span class="price-final">¥739</span>
+            <div class="price-note">F会员券后</div>
+          </div>
+        </div>
+        <div class="shop-links">
+          <a href="https://www.douyin.com/search/小米耳夹式耳机 小米官方旗舰店" target="_blank" class="buy-link dy-link">抖音搜索→官方旗舰店耳夹式</a>
+        </div>
+      </div>
+      <div class="shop-item">
+        <div class="shop-top">
+          <div class="shop-info">
+            <div class="shop-name">小米之家河南省商丘市夏邑县力达购物广场专卖店 <span class="self-tag tag-auth">授权</span></div>
+            <div class="shop-id">线下小米之家授权店</div>
+            <div class="shop-desc">线下同官方价799，F会员券后739</div>
+          </div>
+          <div class="price-block">
+            <span class="price-final">¥739起</span>
+            <div class="price-note">会员券后</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 价格对比图表 -->
+<div class="chart-card">
+  <h2>全产品三平台最低到手价对比</h2>
+  <div id="chart1" class="chart-box"></div>
+</div>
+
+<div class="chart-card">
+  <h2>官方标价 vs 全网最低到手价（含降价幅度）</h2>
+  <div id="chart2" class="chart-box"></div>
+</div>
+
+<!-- 说明 -->
+<div class="note-card">
+  <strong>价格说明与购买建议：</strong><br>
+  1. <strong>直接跳转链接（已实时查找16个）</strong>：报告中 <span style="background:#1565c0;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;">👉 直接打开</span> 按钮为实时查找的商品直接链接（京东u.jd.com推广短链/item.jd.com商品页、淘宝taobao.com商品页），点击直接打开商品详情页，无需搜索。已配置：<strong>京东</strong>：手环11标准版/NFC版/陶瓷版、手环10Pro银色/黑色/送膜版、Redmi Watch 6迷雾蓝/皎月银、Watch S5银色、Watch 5蓝牙版、Buds 8 Pro冰釉白；<strong>天猫/淘宝</strong>：手环11、Watch S5、Watch 5、Buds 8 Pro；<strong>抖音</strong>：手环11（广州自营）。其余商品暂用搜索页链接，后续持续补充。<br>
+  2. <strong>京东、天猫</strong>价格均来自<strong>自营/官方旗舰店</strong>；<strong>抖音</strong>已列出<strong>具体店铺名称、抖音号、直播间名称</strong>。<br>
+  2. 抖音主要官方渠道：<strong>小米官方旗舰店</strong>（抖音号xiaomizhibojian，综合全品类）、<strong>小米官旗手表直播间</strong>（手表专类）、<strong>小米耳机官方直播间</strong>（抖音号mifenkejizhijia，耳机专类，每天早7点直播）、<strong>小米数码旗舰店</strong>（抖音号63679435353，授权数码类）。<br>
+  3. 抖音平台自营店按城市区分：广州、成都高新、上海、武汉、杭州余杭等自营旗舰店均有在售，价格基本一致，国补后相同。<br>
+  4. "国补后"按国家补贴15%计算，实际因地区政策可能有差异；抖音极端低价（198/246/222/148元）需叠加平台券、学生认证、开学季活动等多重优惠，<strong>非所有用户可享</strong>。<br>
+  5. 购买链接为各平台搜索页或商品推广链接，实际价格以下单页面为准；建议优先选择带"自营""官方""品牌"标识的店铺。<br>
+  6. 数据采集时间：2026年9月10日10:55，后续有新品需要添加可随时告知。
+</div>
+
+</div>
+
+<script>
+var chart1 = echarts.init(document.getElementById('chart1'));
+chart1.setOption({
+  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+  legend: { data: ['京东自营', '天猫自营', '抖音全站'], top: 0 },
+  grid: { left: '3%', right: '4%', bottom: '8%', containLabel: true },
+  xAxis: { type: 'category', axisLabel: { fontSize: 11, interval: 0, rotate: 15 }, data: ['手环11\n标准版', '手环11\nNFC版', '手环10Pro', 'Redmi\nWatch6', 'Watch S5\n蓝牙版', 'Watch5\n蓝牙版', 'Buds 6', 'Buds8Pro', '耳夹式\n耳机'] },
+  yAxis: { type: 'value', name: '价格(元)', nameTextStyle: { fontSize: 12 } },
+  series: [
+    { name: '京东自营', type: 'bar', data: [245.65, 288.15, 339.15, 483.65, 934.15, 1486.65, 569, 289, 739], itemStyle: { color: '#1565c0' }, barMaxWidth: 22 },
+    { name: '天猫自营', type: 'bar', data: [235.65, 339.15, 339.15, 356.49, 849.15, null, 528, 369, 739], itemStyle: { color: '#e65100' }, barMaxWidth: 22 },
+    { name: '抖音全站', type: 'bar', data: [198, 288.15, 246, 222, 809, 1441.15, 530, 148, 739], itemStyle: { color: '#c2185b' }, barMaxWidth: 22 }
+  ]
+});
+
+var chart2 = echarts.init(document.getElementById('chart2'));
+chart2.setOption({
+  tooltip: { trigger: 'axis' },
+  legend: { data: ['官方标价', '全网最低到手价', '降价幅度'], top: 0 },
+  grid: { left: '3%', right: '4%', bottom: '8%', containLabel: true },
+  xAxis: { type: 'category', axisLabel: { fontSize: 11, interval: 0, rotate: 15 }, data: ['手环11\n标准版', '手环11\nNFC版', '手环10Pro', 'Redmi\nWatch6', 'Watch S5', 'Watch5\n蓝牙版', 'Buds 6', 'Buds8Pro', '耳夹式'] },
+  yAxis: [
+    { type: 'value', name: '价格(元)', nameTextStyle: { fontSize: 11 } },
+    { type: 'value', name: '降幅(%)', nameTextStyle: { fontSize: 11 }, max: 70 }
+  ],
+  series: [
+    { name: '官方标价', type: 'line', data: [289, 339, 399, 569, 1099, 1999, 699, 399, 799], itemStyle: { color: '#999' }, lineStyle: { type: 'dashed', width: 2 }, symbolSize: 7 },
+    { name: '全网最低到手价', type: 'line', data: [198, 288.15, 246, 222, 809, 1441.15, 466.5, 148, 628.15], itemStyle: { color: '#ff6700' }, lineStyle: { width: 3 }, symbolSize: 9, areaStyle: { color: 'rgba(255,103,0,0.08)' } },
+    { name: '降价幅度', type: 'bar', yAxisIndex: 1, data: [31.5, 15, 38.3, 61, 26.4, 27.9, 33.3, 62.9, 21.4], itemStyle: { color: 'rgba(46,125,50,0.3)' }, barMaxWidth: 20 }
+  ]
+});
+
+window.addEventListener('resize', function(){ chart1.resize(); chart2.resize(); });
+
+function filterCategory(cat) {
+  var cards = document.querySelectorAll('.product-card');
+  var tabs = document.querySelectorAll('.nav-tab');
+  tabs.forEach(function(t){ t.classList.remove('active'); });
+  event.target.classList.add('active');
+  cards.forEach(function(card){
+    if(cat === 'all') { card.style.display = ''; }
+    else { card.style.display = card.getAttribute('data-cat') === cat ? '' : 'none'; }
+  });
+}
+</script>
+</body>
+</html>
